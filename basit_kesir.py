@@ -1,31 +1,54 @@
-import matplotlib.pyplot as plt
+import streamlit as st
 
-def kesir_karsilastir(pay, payda1, payda2):
-    """
-    Payları aynı olan iki kesri yan yana çizer.
-    Mavi: Sabit pay (yenen miktar)
-    Gri: Kalan miktar
-    """
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 4))
+# Sayfa Ayarları
+st.set_page_config(page_title="Kesir Karşılaştırıcı", layout="centered")
+
+st.title("🍕 Kesirleri Karşılaştıralım")
+st.write("Paylar (yediğimiz dilim sayısı) aynı, ama dilimlerin boyu farklı!")
+
+# --- GÜVENLİ VE BASİT GİRİŞ ---
+# Sabit Pay (Mavi renk kodlaması önerisi)
+pay = st.number_input("Kaç dilim yiyeceğiz? (Pay)", min_value=1, max_value=10, value=3)
+
+st.divider()
+
+# İki farklı kesir için kolonlar
+col1, col2 = st.columns(2)
+
+with col1:
+    st.subheader("1. Pizza")
+    payda1 = st.slider("Kaç parçaya bölünsün?", 1, 20, 4, key="p1")
+    deger1 = pay / payda1
     
-    # 1. Kesir Çizimi
-    ax1.barh(['Kesir 1'], [1], color='lightgrey') # Bütün
-    ax1.barh(['Kesir 1'], [pay/payda1], color='skyblue') # Yenen kısım
-    ax1.set_title(f"Payda: {payda1} (Dilimler Büyük)")
-    ax1.set_xlim(0, 1)
+    if deger1 > 1:
+        st.warning("Dilim sayısı pizza sayısını geçti!")
+    else:
+        # Görsel Çubuk (Progress bar basit bir görseldir)
+        st.write(f"Kesir: :blue[{pay}] / :red[{payda1}]")
+        st.progress(deger1)
+        st.caption(f"Dilimler oldukça BÜYÜK!")
 
-    # 2. Kesir Çizimi
-    ax2.barh(['Kesir 2'], [1], color='lightgrey') # Bütün
-    ax2.barh(['Kesir 2'], [pay/payda2], color='salmon') # Yenen kısım
-    ax2.set_title(f"Payda: {payda2} (Dilimler Küçük)")
-    ax2.set_xlim(0, 1)
+with col2:
+    st.subheader("2. Pizza")
+    payda2 = st.slider("Kaç parçaya bölünsün?", 1, 20, 10, key="p2")
+    deger2 = pay / payda2
+    
+    if deger2 > 1:
+        st.warning("Dilim sayısı pizza sayısını geçti!")
+    else:
+        st.write(f"Kesir: :blue[{pay}] / :red[{payda2}]")
+        st.progress(deger2)
+        st.caption(f"Dilimler çok KÜÇÜK!")
 
-    plt.suptitle(f"Paylar Aynı: {pay} Parça", fontsize=16)
-    plt.show()
+# --- MANTIKSAL ÇIKARIM ---
+st.divider()
 
-# TEST: 3/4 mü büyük, 3/10 mu?
-# Çalıştırınca görsel olarak 3/4'ün çok daha uzun olduğunu göreceksin.
-try:
-    kesir_karsilastir(3, 4, 10)
-except Exception as e:
-    print(f"Hata oluştu: {e}")
+if payda1 < payda2:
+    st.success(f"Sonuç: **{pay}/{payda1}** kesri daha BÜYÜKTÜR! Çünkü pizza daha az parçaya bölündü, dilimler dev gibi kaldı.")
+elif payda1 > payda2:
+    st.success(f"Sonuç: **{pay}/{payda2}** kesri daha KÜÇÜKTÜR! Çünkü pizza çok fazla parçaya bölündü, dilimler küçüldü.")
+else:
+    st.info("İki kesir birbirine eşit.")
+
+# --- DİSKALKULİ NOTU ---
+st.info("💡 **Unutma:** Alttaki sayı (payda) ne kadar büyürse, sana düşen dilim o kadar küçülür!")
